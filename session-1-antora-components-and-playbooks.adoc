@@ -1,0 +1,514 @@
+= Session 1: Antora Components & Playbooks
+:imagesdir: images
+:!sectids:
+:toc:
+:source-highlighter: highlight.js
+:highlightjs-theme: ascetic
+:highlightjsdir: https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0
+:icons: font
+:iconfont-cdn: https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css
+:experimental:
+:!figure-caption:
+:url-git-cb:  https://github.com/couchbase
+:url-git-labs: https://github.com/couchbaselabs
+:url-git-server: {url-git-cb}/docs-server
+:url-git-cli: {url-git-cb}/couchbase-cli
+:url-git-backup: {url-git-cb}/backup
+:url-git-lite: {url-git-labs}/docs-couchbase-lite
+:url-git-sync: {url-git-labs}/docs-sync-gateway
+:url-git-sdk-c: {url-git-cb}/docs-sdk-c
+:url-git-sdk-go: {url-git-cb}/docs-sdk-go
+:url-git-sdk-java: {url-git-cb}/docs-sdk-java
+:url-git-sdk-dotnet: {url-git-cb}/docs-sdk-dotnet
+:url-git-sdk-nodejs: {url-git-cb}/docs-sdk-nodejs
+:url-git-sdk-php: {url-git-cb}/docs-sdk-php
+:url-git-sdk-python: {url-git-cb}/docs-sdk-python
+:url-git-kafka: {url-git-cb}/kafka-connect-couchbase
+:url-git-spark: {url-git-cb}/couchbase-spark-connector
+:url-git-home: {url-git-cb}/docs-site
+:url-git-operator: {url-git-cb}/couchbase-operator
+:url-git-asterix: {url-git-labs}/asterix-opt
+:url-docs-antora: https://docs.antora.org/antora/latest
+:url-linux: {url-docs-antora}/install/linux-requirements/
+:url-macos: {url-docs-antora}/install/macos-requirements/
+:url-windows: {url-docs-antora}/install/windows-requirements/
+:url-install: {url-docs-antora}/install/install-antora/
+:url-git-playbook: https://github.com/couchbase/docs-site
+
+== Agenda
+
+* Overview of new documentation repositories
+* Master and release branches
+* Components and _antora.yml_
+* The role of modules and their contents
+* Docs site repository
+* Playbook keys and values
+* Install and run Antora
+
+== Component Repositories
+
+[.grid]
+* *{url-git-home}[docs-site^]*
+* {url-git-server}[docs-server^]
+* {url-git-cli}[couchbase-cli^]
+* {url-git-backup}[backup^]
+* {url-git-asterix}[asterix-opt^]
+* {url-git-lite}[docs-couchbase-lite^]
+* {url-git-sync}[docs-sync-gateway^]
+* {url-git-operator}[couchbase-operator^]
+* {url-git-sdk-c}[docs-sdk-c^]
+* {url-git-sdk-go}[docs-sdk-go^]
+* {url-git-sdk-java}[docs-sdk-java^]
+* {url-git-sdk-dotnet}[docs-sdk-dotnet^]
+* {url-git-sdk-nodejs}[docs-sdk-nodejs^]
+* {url-git-sdk-php}[docs-sdk-php^]
+* {url-git-sdk-python}[docs-sdk-python^]
+* {url-git-kafka}[kafka-connect-couchbase^]
+* {url-git-spark}[couchbase-spark-connector^]
+
+That's a lot of repositories.
+Why are there so many?
+
+By storing the documentation in separate repositories, the teams can manage documentation according to product version (alpha/beta/R.C., stable, EOL), use different processes per repository, and conduct faster review, merge, and release cycles because no set of documentation is blocked by another set of documentation.
+
+== Branches and Versions
+
+Master::
+Contains documentation for unreleased features and the future product version.
+New documentation for the next product version, its features, and non-bug related improvements should be based off of the master branch.
+
+Release/$.$::
+Contains the documentation specific to a corresponding stable product release.
+Fixes related to product bugs and documentation errors in stable releases should be based off of the oldest supported release branch that is affected by the change.
+
+image::docs-server-branch-menu.png[role=cover]
+
+== Repository Structure
+
+The Couchbase documentation is organized into components.
+Components have a standard directory structure and nomenclature.
+This ensures Antora can locate the documentation components, collect the content files, and then build docs.couchbase.com.
+
+=== What is a Component?
+
+A component is usually a discrete product, service, integration, or library with its own user-facing lifecycle.
+The C SDK is an example of a component.
+
+image::sdk-selector.png[role=cover]
+
+At the source level, a documentation component contains all the AsciiDoc page files, their optional assets, examples, and partial files, one or more navigation files, and a component descriptor file. These source files are organized in a repository in a specific structure so Antora can collect and catalog them.
+
+image::docs-lite-master.png[role=cover]
+
+A component isn't recognized by a repository or directory name.
+Instead, it's the presence of the _antora.yml_ file that designates where a component is located.
+
+=== Component Descriptor
+
+When Antora finds _antora.yml_ in a repository, it knows it has located a component or part of component.
+
+.Component Found!
+image::docs-server-repo.png[role=cover]
+
+The component descriptor classifies the files inside this hierarchy using the specified component name and component version (i.e., component version).
+
+.Component Metadata
+image::docs-server-antorayml-5-5.png[role=cover]
+
+=== Modules
+
+A module is a discrete bundle of content, including text, images, and other source materials, organized in a hierarchy of folders by content format, then by optional topic if needed.
+
+image::docs-server-modules.png[role=cover]
+
+A module is stored in the _modules_ directory.
+A component can contain one or more modules.
+
+The name of a module directory becomes part of the site URL
+
+.Admin Module URL
+image::server-url-admin.png[role=cover]
+
+The ROOT module contains all the content that's directly associated with the component itself.
+
+.The ROOT Module
+image::docs-server-modules.png[role=cover]
+
+When pages in the ROOT module are published, these pages are promoted a level above any other modules' pages in that component's URL.
+
+image::server-url-root.png[role=cover]
+
+=== Pages, Assets, and Examples
+
+image::docs-lite-root.png[role=cover]
+
+The _pages_ directory contains a module's AsciiDoc files.
+These files are automatically converted to standalone HTML pages.
+
+.Pages
+image::docs-lite-pages.png[role=cover]
+
+The file name of a page becomes the URL fragment for that page.
+
+Multimedia and supplemental files, organized by format, are stored in the _assets_ directory.
+Photographs, screenshots, and graphic files in _assets/images_ are inserted into pages using the AsciiDoc image macro.
+
+.Images
+image::docs-lite-images.png[role=cover]
+
+Non-AsciiDoc files, such as source code and data values, are stored in the _examples_ directory.
+These files are often inserted into listing blocks using the AsciiDoc include directive.
+
+.Examples
+image::docs-lite-examples.png[role=cover]
+
+==== Partials
+
+Now let's go back to the _pages_ directory; there's one other optional folder named _{blank}_partials_.
+
+.Partials
+image::docs-lite-partials.png[role=cover]
+
+The _{blank}_partials_ directory contains AsciiDoc files that aren't standalone pages.
+These files are referenced by an include directive from a document in the _pages_ directory.
+
+=== Navigation File
+
+.Navigation File
+image::docs-sdk-nav.png[role=cover]
+
+A navigation file, often named _nav.adoc_ contains one or more AsciiDoc lists.
+
+[source,asciidoc]
+----
+.Hello World!
+* xref:start-using-sdk.adoc[Start Using the SDK]
+* xref:common/sample-application.adoc[Sample Application]
+ ** xref:sample-app-backend.adoc[Sample App Backend]
+* xref:common/webui-cli-access.adoc[Browser and CLI Access]
+
+.Users and Security
+* xref:sdk-authentication-overview.adoc[Authentication]
+* xref:sdk-user-management-overview.adoc[User Management]
+ ** xref:sdk-user-management-example.adoc[Sample Code]
+* xref:common/encryption.adoc[Field Level Encryption]
+ ** xref:encrypting-using-sdk.adoc[Field Level Encryption from the Python SDK]
+
+.Working with Data
+* xref:common/core-operations.adoc[Core Operations]
+* xref:document-operations.adoc[Document Operations]
+* xref:common/subdocument-operations.adoc[Sub-Document Operations]
+* xref:datastructures.adoc[Data Structures]
+* xref:common/n1ql-query.adoc[Querying with N1QL]
+* xref:n1ql-queries-with-sdk.adoc[N1QL from the SDK]
+* xref:common/full-text-search-overview.adoc[Full Text Search]
+* xref:full-text-searching-with-sdk.adoc[Searching from the SDK]
+* xref:view-queries-with-sdk.adoc[MapReduce Views]
+* xref:async-programming.adoc[Asynchronous Programming]
+* xref:common/batching-operations.adoc[Batching Operations]
+* xref:common/durability.adoc[Durability]
+* xref:common/concurrent-mutations-cluster.adoc[Concurrent Document Mutations]
+* xref:sdk-xattr-overview.adoc[Extended Attributes]
+ ** xref:sdk-xattr-example.adoc[Sample Code]
+* xref:common/nonjson.adoc[Non-JSON Documents]
+* xref:common/compression-intro.adoc[Compression]
+
+.Deployment Environments
+* xref:managing-connections.adoc[Managing Connections]
+* xref:managing-clusters.adoc[Managing Clusters]
+* xref:compatibility-versions-features.adoc[Compatibility]
+
+.Settings, Error Handling & Diagnostics
+* xref:client-settings.adoc[Client Settings]
+* xref:handling-error-conditions.adoc[Handling Errors]
+* xref:failure-considerations.adoc[Failure Considerations]
+* xref:collecting-information-and-logging.adoc[Collecting Information]
+* xref:threshold-logging.adoc[Threshold Logging]
+* xref:tracing-from-the-sdk.adoc[Tracing from the SDK]
+----
+
+Antora uses navigation files to build the site's component navigation menus.
+
+image::sdk-component-menu.png[role=cover]
+
+A navigation file must be declared in the component descriptor in order to be displayed in the component's navigation menu.
+
+[source,yaml]
+----
+name: python-sdk
+title: Python SDK
+version: '2.2'
+start_page: ROOT:start-using-sdk.adoc
+nav:
+- modules/ROOT/nav.adoc
+server_version: '5.5'
+----
+
+If you're interested in learning more about how Antora assembles the site's navigation from source to menu, see {url-docs-antora}/navigation/[Navigation Assembly^]
+
+== The Distributed Server Component
+
+While it's common to find all of a component's files in a single repository, a component can be distributed across several repositories.
+For example, the server component is aggregated from the _docs-server_, _couchbase-cli_, _backup_, _docs-analytics_, and _kafka-connect-couchbase_ repositories.
+
+Let's look at the couchbase-cli repository.
+Notice the _antora.yml_ file and the _modules/cli_ directory.
+This repository contains a module named _cli_.
+
+image::docs-cli-repo.png[role=cover]
+
+When you open the _antora.yml_ file, you'll see that this _cli_ module is part of the Server 5.5 component.
+
+image::cli-antorayml.png[role=cover]
+
+If you go to the docs-server repository, you'll see that this repository also contains a module named _cli_.
+
+image::docs-server-cli.png[role=cover]
+
+Antora, using the information in each repositories' _antora.yml_ file, will aggregate the files in both _cli_ directories into a single _cli_ module.
+
+.Page from the docs-server _cli_ directory.
+image::cli-bucket.png[role=cover]
+
+.Page from the couchbase_cli _cli_ directory.
+image::cbanalyze.png[role=cover]
+
+This capability is one of the reasons the component descriptor file, _antora.yml_, is so important.
+It:
+
+* Makes documentation portable.
+* Decouples the repository structure from the documentation site output.
+* Decouples branches from the documentation site output.
+
+== The Docs Site Repository
+
+The docs-site repository contains:
+
+* The Home component (site home page and contribute module)
+** The home component is typically organizational documentation not specific to any product or version
+* Custom extensions
+* Site playbooks
+
+image::docs-site-repo.png[role=cover]
+
+=== Extensions
+
+These extensions were developed exclusively for the Couchbase documentation.
+
+image::extensions.png[role=cover]
+
+=== Playbooks
+
+A playbook is a recipe for a site and an environment.
+
+* Production
+* Staging
+* Local, and more
+
+Let's walk through the key-value pairs that instruct Antora during the creation of the site.
+
+.Build This Site
+[source,yaml]
+----
+site:
+  title: Couchbase Docs (Staging) # <1>
+  url: https://docs-staging.couchbase.com # <2>
+  start_page: home::index.adoc # <3>
+----
+<1> Title of the site
+<2> Canonical URL of the site
+<3> Location of the site's home page
+
+.Look For Components Here
+[source,yaml]
+----
+content:
+  branches: release/* # <1>
+  sources:
+  - url: . # <2>
+    branches: HEAD # <3>
+    start_path: home # <4>
+  - url: git@github.com:couchbase/couchbase-operator.git # <5>
+    branches: [beta2, master] # <6>
+    start_path: docs/user
+----
+<1> When collecting content from the repositories listed under the content key, use branches starting with `release/` unless other branches are specifically named.
+<2> Antora is run from the docs-site repository, so the location of the repository is simply specified by a dot `.`.
+<3> Only collect files from the current working tree of the docs-site repository.
+<4> Start looking for the content files in the _home_ directory of the repository.
+<5> Find the couchbase-operator repository at this URL.
+<6> Only collect files from the `beta2` and `master` branches.
+
+.{blank}...And Here
+[source,yaml]
+----
+- url: git@github.com:couchbase/docs-analytics.git
+  branches: [1.0.x]
+- url: https://github.com/cb-docs-review-space/couchbase-cli.git
+  branches: v*
+  start_path: docs
+- url: git@github.com:cb-docs-review-space/backup.git
+  branches: v*
+  start_path: docs
+- url: https://github.com/cb-docs-review-space/kafka-connect-couchbase.git
+  branches: [server-v5.1, server-v5.5]
+  start_path: docs
+----
+
+.{blank}...And Here
+[source,yaml]
+----
+- url: git@github.com:couchbase/docs-server.git
+- url: git@github.com:couchbase/docs-sdk-c.git
+- url: git@github.com:couchbase/docs-sdk-dotnet.git
+- url: git@github.com:couchbase/docs-sdk-go.git
+- url: git@github.com:couchbase/docs-sdk-java.git
+- url: git@github.com:couchbase/docs-sdk-nodejs.git
+- url: git@github.com:couchbase/docs-sdk-php.git
+- url: git@github.com:couchbase/docs-sdk-python.git
+- url: https://github.com/couchbaselabs/docs-couchbase-lite
+  branches: [master, release/2.0, release/1.4]
+----
+
+.Apply These AsciiDoc Attributes To All The Docs
+[source,yaml]
+----
+asciidoc:
+  attributes: # <1>
+    experimental: ''
+    toc: ~
+    xrefstyle: short
+----
+<1> Apply the following AsciiDoc attributes to all of the documentation files.
+
+.Plug In These Custom Extensions
+[source,yaml]
+----
+asciidoc:
+  extensions: # <1>
+  - ./lib/block-json-config-ui-macro.js
+  - ./lib/block-swagger-ui-macro.js
+  - ./lib/inline-man-macro.js
+  - ./lib/multirow-table-head-tree-processor.js
+----
+<1> Plug in these custom extensions to the Antora pipeline.
+
+.Go Get the UI
+[source,yaml]
+----
+ui:
+  bundle:
+    url: https://github.com/couchbase/docs-ui/releases/download/v118/ui-bundle.zip # <1>
+----
+<1> Locate and apply this version of the site theme to the documentation site.
+
+.When You're Done Building, Put The Site Files In This Folder
+[source,yaml]
+----
+output:
+  dir: ./public # <1>
+----
+<1> Output the site file to this directory.
+
+=== What Antora Does When You Run It With A Playbook
+
+image::how-antora-works.png[role=cover]
+
+If you want to learn how Antora processes the content files, see {url-docs-antora}/how-antora-works/[How Antora Works].
+
+== Prepare Your System
+
+Antora runs on most Linux distributions, macOS, and Windows.
+Follow the prerequisite instructions to install the base build tools and Node 8 on your operating system:
+
+* {url-linux}[Linux: Install base build tools and Node^]
+* {url-macos}[macOS: Install Xcode and Node^]
+* {url-windows}[Windows: Install Chocolatey and Node^]
+
+Some of the Couchbase documentation is stored in private repositories.
+In order for Antora to access these repositories from your device, you need to have your SSH agent running.
+
+.Don't Forget to Start Your SSH Agent!
+ $ eval $(ssh-agent -s)
+   ssh-add ~/.ssh/id_rsa
+
+See {url-docs-antora}/playbook/private-repository-auth/#configure-your-ssh-agent[Configure Your SSH Agent^] for detailed instructions.
+
+== Install Antora
+
+To build the Couchbase documentation site on your computer, you need the Antora command line interface (CLI) and the Antora site generator.
+
+In your terminal, type:
+
+ $ nvm use 8
+ $ npm install -g @antora/cli @antora/site-generator-default
+
+Verify the `antora` command is available on your PATH:
+
+ $ antora -v
+
+If installation was successful, you should see the Antora version number displayed in the console.
+
+== Get the Docs Site Repository
+
+Now that Antora is installed, you need to get the Couchbase playbook project.
+
+. Go to the {url-git-playbook}[Docs Site repository^] on GitHub and click btn:[Fork].
+. Create or select the local folder where you want to store the repository on your device, then open a terminal and change into that folder.
+
+ $ cd path/to/folder
+
+. Go to your repository on GitHub, and click btn:[Clone or download].
+. Click the Clipboard icon to copy the repository's Git URL.
+. In your terminal type `git clone`, paste the copied URL, and press kbd:[Enter].
+
+ $ git clone git@github.com:this-is-you/docs-site.git
+
+. Change into the repository folder created by the clone operation.
+
+ $ cd docs-site
+
+. List the contents of docs-site.
+
+ $ ls
+
+You should see a file named _staging-antora-playbook.yml_.
+This is the playbook you'll use to build the documentation site on your computer.
+
+== Run Antora
+
+Make sure you're still in the doc-site directory.
+You have to run Antora from this directory so it can access the extensions.
+
+To run Antora, type `antora` and then the name of the staging playbook:
+
+ docs-site $ antora staging-antora-playbook
+
+The cloning progress of each component repository is displayed in the console, followed by any AsciiDoc or Antora warning and error messages.
+The site generation is complete when the command prompt (`$`) reappears in the terminal.
+
+Antora generated the site into a directory named _public_.
+Switch to it.
+
+ docs-site $ cd public
+
+On some operating systems, you can open the site directly from the command line by typing `open` and the name of an HTML file.
+
+ public $ open index.html
+
+Or, you can navigate to and open _index.html_ using your file explorer or browser.
+
+.Success!
+image::docs-site.png[role=cover]
+
+== What's Next
+
+Now it's your turn to install Antora and run it on your computer with the staging playbook.
+
+* Install Antora on your computer
+* Fork and clone the Docs Site repository
+* Build the site on your computer with the staging playbook
+
+If you get stuck, join the office hours chat room for help and to ask any questions.
+
+Next week, we'll focus on using Atom to work with GitHub and your documentation repositories, the special AsciiDoc features your documentation set uses, common gotchas, and testing your changes using a local playbook and Antora.
