@@ -509,6 +509,6 @@ Now it's your turn to install Antora and run it on your computer with the stagin
 * Fork and clone the Docs Site repository
 * Build the site on your computer with the staging playbook
 
-If you get stuck, join the office hours chat room for help and to ask any questions.
+If you get stuck, join the https://gitter.im/opendevise/couchbase-docs-training[training chat room] for help and to ask any questions.
 
 Next week, we'll focus on using Atom to work with GitHub and your documentation repositories, the special AsciiDoc features your documentation set uses, common gotchas, and testing your changes using a local playbook and Antora.

@@ -10,7 +10,7 @@ This repository contains the training transcripts for the Couchbase Docs Team.
 
 == Help
 
-Visit the training chat room for help and to ask questions.
+Visit the https://gitter.im/opendevise/couchbase-docs-training[training chat room] for help and to ask questions.
 
 == Copyright
 
