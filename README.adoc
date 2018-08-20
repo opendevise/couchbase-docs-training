@@ -14,5 +14,5 @@ Visit the training chat room for help and to ask questions.
 
 == Copyright
 
-Copyright (C) 2018 {uri-opendevise}[OpenDevise Inc.]
+Copyright (C) 2018 {url-opendevise}[OpenDevise Inc.]
 All rights reserved.
