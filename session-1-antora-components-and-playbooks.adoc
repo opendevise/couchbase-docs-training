@@ -8,7 +8,7 @@
 :icons: font
 :iconfont-cdn: https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css
 :experimental:
-:!figure-caption:
+:figure-caption:
 :url-git-cb:  https://github.com/couchbase
 :url-git-labs: https://github.com/couchbaselabs
 :url-git-server: {url-git-cb}/docs-server
